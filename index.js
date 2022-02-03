@@ -2,7 +2,7 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const client = new Discord.Client({
 	presence: {
-		activities: [{name: 'those messages'}], status: 'watching'
+		activities: [{name: 'those messages', type: "WATCHING"}]
 	},
 	intents: Discord.Intents.FLAGS.GUILD_MESSAGES
 });
