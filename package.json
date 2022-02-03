@@ -1,0 +1,13 @@
+{
+  "name": "discord-channel-restorer",
+  "version": "1.0.0",
+  "description": "A discord bot for restoring deleted channels",
+  "main": "index.js",
+  "repository": "https://github.com/Peperman66/discord-channel-restorer.git",
+  "author": "Peperman66 <peperman66@seznam.cz>",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^7.5.0",
+    "discord.js": "^13.6.0"
+  }
+}
