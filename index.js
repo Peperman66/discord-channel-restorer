@@ -1,12 +1,14 @@
 require("dotenv").config();
 const Discord = require("discord.js");
+const fs = require('fs');
+require('./create-db.js').run();
+
 const client = new Discord.Client({
 	presence: {
 		activities: [{name: 'those messages', type: "WATCHING"}]
 	},
 	intents: Discord.Intents.FLAGS.GUILD_MESSAGES
 });
-const fs = require('fs');
 
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith(".js"));
