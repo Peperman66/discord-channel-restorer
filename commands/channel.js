@@ -2,7 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 
 const subcommands = new Discord.Collection();
-const subcommandFiles = fs.readdirSync('./channel/').filter(file => file.endsWith('js'));
+const subcommandFiles = fs.readdirSync('./commands/channel/').filter(file => file.endsWith('js'));
 for (file of subcommandFiles) {
 	const subcommand = require(`./channel/${file}`);
 	subcommands.set(subcommand.data.name, subcommand);
