@@ -10,10 +10,10 @@ function createCommandFromData(command, data) {
 		data.options.forEach(option => {
 			switch(option.type) {
 				case 'CHANNEL':
-					command.addChannelOption(commandOption => createCommandOptionFromData(commandOption, data));
+					command.addChannelOption(commandOption => createCommandOptionFromData(commandOption, option));
 					break;
 				case 'STRING':
-					command.addStringOption(commandOption => createCommandOptionFromData(commandOption, data));
+					command.addStringOption(commandOption => createCommandOptionFromData(commandOption, option));
 			}
 		})
 	}
@@ -25,7 +25,7 @@ function createCommandOptionFromData(option, data) {
 	if (data.required != null) {
 		option.setRequired(data.required);
 	}
-	return option
+	return option;
 }
 
 const commands = [];
