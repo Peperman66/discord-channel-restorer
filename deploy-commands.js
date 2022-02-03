@@ -13,7 +13,7 @@ function createCommandFromData(command, data) {
 					command.addChannelOption(commandOption => createCommandOptionFromData(commandOption, data));
 					break;
 				case 'STRING':
-					command.addStringOption(commandOtion => createCommandOptionFromData(commandOption, data));
+					command.addStringOption(commandOption => createCommandOptionFromData(commandOption, data));
 			}
 		})
 	}
@@ -25,6 +25,7 @@ function createCommandOptionFromData(option, data) {
 	if (data.required != null) {
 		option.setRequired(data.required);
 	}
+	return option
 }
 
 const commands = [];
@@ -35,9 +36,9 @@ for (const file of commandFiles) {
 	const command = createCommandFromData(new SlashCommandBuilder(), commandData);
 	if (commandData.subcommandFiles != null) {
 		commandData.subcommandFiles.forEach(subcommandFile => {
-			const subcommandData = require(`./commands/${subcommandFile}`);
+			const subcommandData = require(`./commands/${subcommandFile}`).data;
 			command.addSubcommand(subcommand => {
-				createCommandFromData(subcommand, subcommandData);
+				return createCommandFromData(subcommand, subcommandData);
 			});
 		});
 	}
@@ -46,6 +47,6 @@ for (const file of commandFiles) {
 
 const rest = new REST({version: '9'}).setToken(process.env.TOKEN);
 
-rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.MAIN_GUILD_ID), {body: commands})
+rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {body: commands})
 	.then(() => console.log('Succesfully registered application commands.'))
 	.catch(console.error);
