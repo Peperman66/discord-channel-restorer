@@ -26,7 +26,7 @@ module.exports.execute = async function(interaction) {
 
 	const messages = messageQuery.all(channelId, interaction.guildId);
 	const estimatedEnd = Date.now() + messages.length * 2000; //Every message takes two seconds to send
-	interaction.followUp(`Estimated time of completion: <t:${Math.ceil(estimatedEnd/1000)}:R>`);
+	interaction.followUp(`Restoring ${messages.length} messages! Estimated time of completion: <t:${Math.ceil(estimatedEnd/1000)}:R>`);
 	const webhooks = new Collection();
 	for (const message of messages ){
 		if (!webhooks.get(message.UserID)) {
@@ -49,7 +49,6 @@ module.exports.execute = async function(interaction) {
 		if (content.content == "" && content.embeds.length == 0 && content.files.length == 0) content.content = "​";
 
 		const newMessage = await webhook.send(content);
-		console.log(message.Pinned);
 		if (message.Pinned == 1) {
 			newMessage.pin();
 		}

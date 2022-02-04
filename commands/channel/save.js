@@ -14,7 +14,6 @@ async function getAllMessagesInChannel(channel) {
 		var currentMessages = await channel.messages.fetch({before: last?.id});
 		last = currentMessages?.last();
 		messages = messages.concat(currentMessages);
-		console.log(currentMessages.size);
 	} while (currentMessages.size > 0); 
 	return messages;
 }
@@ -26,6 +25,7 @@ module.exports.execute = async function(interaction) {
 		await targetChannel.fetch();
 	}
 	const messages = await getAllMessagesInChannel(targetChannel);
+	interaction.followUp(`Saving ${messages.size} messages!`);
 	messageSave.save(messages)
 		.then(() => {
 			if (channelSaveExistsQuery.get(targetChannel.id) != null) {
