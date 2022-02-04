@@ -2,12 +2,13 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const fs = require('fs');
 require('./create-db.js').run();
+const messageSave = require('./handlers/messageSave.js');
 
 const client = new Discord.Client({
 	presence: {
 		activities: [{name: 'those messages', type: "WATCHING"}]
 	},
-	intents: Discord.Intents.FLAGS.GUILD_MESSAGES
+	intents: [Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILDS]
 });
 
 client.commands = new Discord.Collection();
@@ -20,6 +21,14 @@ for (file of commandFiles) {
 
 client.on('ready', () => {
 	console.log("Bot is ready!");
+});
+
+client.on('messageCreate', message => {
+	messageSave.save(new Discord.Collection([[message.id, message]]));
+});
+
+client.on('messageUpdate', (oldMsg, newMsg) => {
+	messageSave.save(new Discord.Collection([[newMsg.id, newMsg]]));
 })
 
 client.on('interactionCreate', async interaction => {
