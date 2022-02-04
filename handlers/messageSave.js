@@ -1,4 +1,4 @@
-const db = require('better-sqlite3')('db/data.db');
+const db = require('better-sqlite3')('db/data.db', {fileMustExist: true});
 
 const channelExistsQuery = db.prepare('SELECT * FROM Channel WHERE ID = ?');
 const channelCreateQuery = db.prepare('INSERT INTO Channel (ID, GuildID, Name, LastSaved) VALUES (?, ?, ?, ?)');
@@ -17,7 +17,7 @@ const attachmentExistsQuery = db.prepare('SELECT * FROM Attachment WHERE ID = ? 
 const attachmentCreateQuery = db.prepare('INSERT INTO Attachment (ID, MessageID, Name, Url) VALUES (?, ?, ?, ?)');
 
 const saveTransaction = db.transaction(async (messages) => {
-	messages.forEach(async (message) => {
+	for (const [id, message] of messages) {
 		if (message.partial) {
 			await message.fetch();
 		}
@@ -40,7 +40,6 @@ const saveTransaction = db.transaction(async (messages) => {
 				userCreateQuery.run(message.author.id, message.member.displayName, message.member.displayAvatarURL({size:4096}));
 			}
 		}
-		console.log(message.content);
 		if (messageExistsQuery.get(message.id) != null) {
 			messageUpdateQuery.run(message.content, message.id);
 			embedDeleteQuery.run(message.id);
@@ -59,7 +58,7 @@ const saveTransaction = db.transaction(async (messages) => {
 				}
 			});
 		}
-	});
+	};
 })
 
 module.exports.save = async function(messages) {
