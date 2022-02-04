@@ -14,7 +14,7 @@ const embedDeleteQuery = db.prepare('DELETE FROM Embed WHERE MessageID = ?');
 const embedCreateQuery = db.prepare('INSERT INTO Embed (MessageID, Content) VALUES (?, ?)');
 
 const attachmentExistsQuery = db.prepare('SELECT * FROM Attachment WHERE ID = ? AND MessageID = ?');
-const attachmentCreateQuery = db.prepare('INSERT INTO Attachment (ID, MessageID, Name, Url) VALUES (?, ?, ?, ?)');
+const attachmentCreateQuery = db.prepare('INSERT INTO Attachment (ID, MessageID, Name, Description, Url) VALUES (?, ?, ?, ?, ?)');
 
 const saveTransaction = db.transaction(async (messages) => {
 	for (const [id, message] of messages) {
@@ -55,7 +55,7 @@ const saveTransaction = db.transaction(async (messages) => {
 		if (message.attachments.size > 0) {
 			message.attachments.forEach(attachment => {
 				if (attachmentExistsQuery.get(attachment.id, message.id) == null) {
-					attachmentCreateQuery.run(attachment.id, message.id, attachment.name, attachment.url);
+					attachmentCreateQuery.run(attachment.id, message.id, attachment.name, attachment.description, attachment.url);
 				}
 			});
 		}

@@ -30,6 +30,7 @@ tables = [
 		ID VARCHAR(20) PRIMARY KEY,
 		MessageID VARCHAR(20) REFERENCES Message(ID),
 		Name TEXT NOT NULL,
+		Description TEXT,
 		Url TEXT NOT NULL
 	)`
 ]

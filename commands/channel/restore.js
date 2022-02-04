@@ -11,7 +11,7 @@ WHERE Channel.ID = ? AND Channel.GuildID = ?
 ORDER BY Message.CreatedAt`);
 
 const embedQuery = db.prepare('SELECT Content FROM Embed WHERE MessageID = ?');
-const attachmentQuery = db.prepare('SELECT ID, Name, Url FROM Attachment WHERE MessageID = ?');
+const attachmentQuery = db.prepare('SELECT ID, Name, Description, Url FROM Attachment WHERE MessageID = ?');
 
 module.exports.execute = async function(interaction) {
 	await interaction.deferReply();
@@ -43,7 +43,7 @@ module.exports.execute = async function(interaction) {
 
 		const attachments = attachmentQuery.all(message.ID);
 		for (const attachment of attachments) {
-			content.files.push({attachment: attachment.Url, name: attachment.Name});
+			content.files.push({attachment: attachment.Url, name: attachment.Name, description: attachment.Description});
 		}
 
 		if (content.content == "" && content.embeds.length == 0 && content.files.length == 0) content.content = "​";
