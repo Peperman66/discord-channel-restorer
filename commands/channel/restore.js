@@ -4,7 +4,7 @@ const db = require('better-sqlite3')('db/data.db', {readonly: true});
 
 const channelQuery = db.prepare('SELECT Name FROM Channel WHERE ID = ? AND GuildID = ?');
 const messageQuery = db.prepare(`
-SELECT Message.ID, Message.UserID, Message.Content, User.Username, User.AvatarURL FROM Message 
+SELECT Message.ID, Message.UserID, Message.Pinned, Message.Content, User.Username, User.AvatarURL FROM Message 
 INNER JOIN Channel ON Message.ChannelID = Channel.ID 
 INNER JOIN User ON Message.UserID = User.ID
 WHERE Channel.ID = ? AND Channel.GuildID = ?
@@ -46,10 +46,13 @@ module.exports.execute = async function(interaction) {
 			content.files.push({attachment: attachment.Url, name: attachment.Name});
 		}
 
-		if (content.content == "") content.content = "​";
-		if (content.content == "" && content.embeds.length == 0 && content.attachments.length == 0) continue;
+		if (content.content == "" && content.embeds.length == 0 && content.files.length == 0) content.content = "​";
 
-		await webhook.send(content);
+		const newMessage = await webhook.send(content);
+		console.log(message.Pinned);
+		if (message.Pinned == 1) {
+			newMessage.pin();
+		}
 		await new Promise(resolve => setTimeout(resolve, 2000)); //Synchronous sleep 2000ms
 	};
 

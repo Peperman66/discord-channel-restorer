@@ -7,8 +7,8 @@ const userExistQuery = db.prepare('SELECT * FROM User WHERE ID = ?');
 const userCreateQuery = db.prepare('INSERT INTO User (ID, Username, AvatarURL) VALUES (?, ?, ?)');
 
 const messageExistsQuery = db.prepare('SELECT * FROM Message WHERE ID = ?');
-const messageUpdateQuery = db.prepare('UPDATE Message SET Content = ? WHERE ID = ?');
-const messageCreateQuery = db.prepare('INSERT INTO Message (ID, ChannelID, UserID, CreatedAt, Content) VALUES (?, ?, ?, ?, ?)');
+const messageUpdateQuery = db.prepare('UPDATE Message SET Content = ?, Pinned = ? WHERE ID = ?');
+const messageCreateQuery = db.prepare('INSERT INTO Message (ID, ChannelID, UserID, CreatedAt, Pinned, Content) VALUES (?, ?, ?, ?, ?, ?)');
 
 const embedDeleteQuery = db.prepare('DELETE FROM Embed WHERE MessageID = ?');
 const embedCreateQuery = db.prepare('INSERT INTO Embed (MessageID, Content) VALUES (?, ?)');
@@ -21,7 +21,7 @@ const saveTransaction = db.transaction(async (messages) => {
 		if (message.partial) {
 			await message.fetch();
 		}
-		if (channelExistsQuery.get(message.channel.id) == null) {
+		if (channelExistsQuery.get(message.channelId) == null) {
 			if (message.channel.partial) {
 				await message.channel.fetch();
 			}
@@ -41,10 +41,11 @@ const saveTransaction = db.transaction(async (messages) => {
 			}
 		}
 		if (messageExistsQuery.get(message.id) != null) {
-			messageUpdateQuery.run(message.content, message.id);
+			console.log(message.pinned);
+			messageUpdateQuery.run(message.content, message.pinned ? 1 : 0, message.id);
 			embedDeleteQuery.run(message.id);
 		} else {
-			messageCreateQuery.run(message.id, message.channelId, message.author.id, message.createdAt.getTime(), message.content);
+			messageCreateQuery.run(message.id, message.channelId, message.author.id, message.createdAt.getTime(), message.pinned ? 1 : 0, message.content);
 		}
 		if (message.embeds.length > 0) {
 			for (const embed of message.embeds) {
