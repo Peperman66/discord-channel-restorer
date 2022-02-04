@@ -28,10 +28,17 @@ const saveTransaction = db.transaction(async (messages) => {
 			channelCreateQuery.run(message.channelId, message.guildId, message.channel.name, null);
 		}
 		if (userExistQuery.get(message.author.id) == null) {
-			if (message.member.partial) {
-				await message.member.fetch();
+			if (message.member == null) {
+				if (message.author.partial) {
+					await message.author.fetch();
+				}
+				userCreateQuery.run(message.author.id, message.author.username, message.author.displayAvatarURL({size:4096}));
+			} else {
+				if (message.member.partial) {
+					await message.member.fetch();
+				}
+				userCreateQuery.run(message.author.id, message.member.displayName, message.member.displayAvatarURL({size:4096}));
 			}
-			userCreateQuery.run(message.author.id, message.member.displayName, message.member.displayAvatarURL({size:4096}));
 		}
 		if (messageExistsQuery.get(message.id) != null) {
 			messageUpdateQuery.run(message.content, message.id);
@@ -41,7 +48,7 @@ const saveTransaction = db.transaction(async (messages) => {
 		}
 		if (message.embeds.length > 0) {
 			for (const embed of message.embeds) {
-				embedCreateQuery.run(message.id, embed.toJSON());
+				embedCreateQuery.run(message.id, JSON.stringify(embed.toJSON()));
 			}
 		}
 		if (message.attachments.length > 0) {
