@@ -25,9 +25,10 @@ module.exports.execute = async function(interaction) {
 	const targetChannel = await interaction.guild.channels.create(channelData.Name, {topic: channelData.Topic});
 
 	const messages = messageQuery.all(channelId, interaction.guildId);
-	const estimatedEnd = Date.now() + messages.length * 2000; //Every message takes two seconds to send
-	interaction.followUp(`Restoring ${messages.length} messages! Estimated time of completion: <t:${Math.ceil(estimatedEnd/1000)}:R>`);
+	const estimatedEnd = Date.now() + messages.length * 2050; //Every message takes two seconds (plus some extra) to send
+	const progressMessage = await interaction.followUp(`Restoring 0/${messages.length} messages! Estimated time of completion: <t:${Math.ceil(estimatedEnd/1000)}:R>`);
 	const webhooks = new Collection();
+	let finished = 0;
 	for (const message of messages ){
 		if (!webhooks.get(message.UserID)) {
 			const webhook = await targetChannel.createWebhook(message.Username, {avatar: message.AvatarURL});
@@ -37,7 +38,6 @@ module.exports.execute = async function(interaction) {
 		let content = {content: message.Content, allowedMentions: {parse: ["everyone", "roles", "users"]}, embeds: [], files: []};
 		const embeds = embedQuery.all(message.ID);
 		for (const embed of embeds) {
-			console.log(embed);
 			content.embeds.push(JSON.parse(embed.Content));
 		}
 
@@ -45,13 +45,16 @@ module.exports.execute = async function(interaction) {
 		for (const attachment of attachments) {
 			content.files.push({attachment: attachment.Url, name: attachment.Name, description: attachment.Description});
 		}
-
+		if (content.content == "" && (content.embeds.length > 0 || content.files.length > 0)) content.content = null;
 		if (content.content == "" && content.embeds.length == 0 && content.files.length == 0) content.content = "​";
 
 		const newMessage = await webhook.send(content);
 		if (message.Pinned == 1) {
 			newMessage.pin();
 		}
+		finished++;
+		const estimatedEnd = Date.now() + (messages.length - finished) * 2100; //Every message takes two seconds (plus some extra) to send
+		progressMessage.edit(`Restoring ${finished}/${messages.length} messages! Estimated time of completion: <t:${Math.ceil(estimatedEnd/1000)}:R>`);
 		await new Promise(resolve => setTimeout(resolve, 2000)); //Synchronous sleep 2000ms
 	};
 
