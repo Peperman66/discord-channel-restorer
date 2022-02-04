@@ -41,7 +41,6 @@ const saveTransaction = db.transaction(async (messages) => {
 			}
 		}
 		if (messageExistsQuery.get(message.id) != null) {
-			console.log(message.pinned);
 			messageUpdateQuery.run(message.content, message.pinned ? 1 : 0, message.id);
 			embedDeleteQuery.run(message.id);
 		} else {
