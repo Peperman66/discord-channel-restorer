@@ -7,7 +7,12 @@ module.exports.execute = async function(interaction) {
 	const result = statement.all(interaction.guildId);
 	let description = "<Channel name>\t<Channel ID>\t<Last saved>\n";
 	for (row of result) {
-		description += `${row.Name}\t${row.ID}\t<t:${row.LastSaved}>\n`;
+		description += `${row.Name}\t${row.ID}\t`;
+		if (row.LastSaved == null){
+			description += `None\n`;
+		} else { 
+			description += `<t:${row.LastSaved}>\n`;
+		}
 	}
 	if (!interaction.guild.available) {
 		await interaction.guild.fetch();
