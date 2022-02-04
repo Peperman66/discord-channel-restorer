@@ -17,6 +17,7 @@ tables = [
 		ChannelID VARCHAR(20) REFERENCES Channel(ID),
 		UserID VARCHAR(20) REFERENCES User(ID),
 		CreatedAt TIMESTAMP NOT NULL,
+		Pinned BOOLEAN NOT NULL CHECK (Pinned IN (0, 1)) DEFAULT 0,
 		Content TEXT
 	)`,
 	`CREATE TABLE IF NOT EXISTS Embed (
