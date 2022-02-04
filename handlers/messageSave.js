@@ -40,22 +40,24 @@ const saveTransaction = db.transaction(async (messages) => {
 				userCreateQuery.run(message.author.id, message.member.displayName, message.member.displayAvatarURL({size:4096}));
 			}
 		}
+		console.log(message.content);
 		if (messageExistsQuery.get(message.id) != null) {
 			messageUpdateQuery.run(message.content, message.id);
 			embedDeleteQuery.run(message.id);
 		} else {
-			messageCreateQuery.run(message.id, message.channelId, message.author.id, message.createdAt.getTime() / 1000, message.content);
+			messageCreateQuery.run(message.id, message.channelId, message.author.id, message.createdAt.getTime(), message.content);
 		}
 		if (message.embeds.length > 0) {
 			for (const embed of message.embeds) {
 				embedCreateQuery.run(message.id, JSON.stringify(embed.toJSON()));
 			}
 		}
-		if (message.attachments.length > 0) {
-			for (const attachment of message.attachments) {
-				if (attachmentExistsQuery.get(attachment.id, message.id) != null) continue;
-				attachmentCreateQuery.run(attachment.id, message.id, attachment.name, attachment.url);
-			}
+		if (message.attachments.size > 0) {
+			message.attachments.forEach(attachment => {
+				if (attachmentExistsQuery.get(attachment.id, message.id) == null) {
+					attachmentCreateQuery.run(attachment.id, message.id, attachment.name, attachment.url);
+				}
+			});
 		}
 	});
 })
