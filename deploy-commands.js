@@ -25,6 +25,9 @@ function createCommandOptionFromData(option, data) {
 	if (data.required != null) {
 		option.setRequired(data.required);
 	}
+	if (data.channelTypes != null) {
+		option.addChannelTypes(data.channelTypes)
+	}
 	return option;
 }
 
