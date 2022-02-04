@@ -16,16 +16,22 @@ const embedCreateQuery = db.prepare('INSERT INTO Embed (MessageID, Content) VALU
 const attachmentExistsQuery = db.prepare('SELECT * FROM Attachment WHERE ID = ? AND MessageID = ?');
 const attachmentCreateQuery = db.prepare('INSERT INTO Attachment (ID, MessageID, Name, Url) VALUES (?, ?, ?, ?)');
 
-const saveTransaction = db.transaction((messages) => {
-	for (const message of messages) {
-		if (channelExistsQuery.get() == null) {
+const saveTransaction = db.transaction(async (messages) => {
+	messages.forEach(async (message) => {
+		if (message.partial) {
+			await message.fetch();
+		}
+		if (channelExistsQuery.get(message.channel.id) == null) {
+			if (message.channel.partial) {
+				await message.channel.fetch();
+			}
 			channelCreateQuery.run(message.channelId, message.guildId, message.channel.name, null);
 		}
 		if (userExistQuery.get(message.author.id) == null) {
 			if (message.member.partial) {
-				message.member.fetch();
+				await message.member.fetch();
 			}
-			userCreateQuery.run(message.author.id, message.member.nickname, message.member.displayAvatarURL({size:4096}));
+			userCreateQuery.run(message.author.id, message.member.displayName, message.member.displayAvatarURL({size:4096}));
 		}
 		if (messageExistsQuery.get(message.id) != null) {
 			messageUpdateQuery.run(message.content, message.id);
@@ -44,7 +50,7 @@ const saveTransaction = db.transaction((messages) => {
 				attachmentCreateQuery.run(attachment.id, message.id, attachment.name, attachment.url);
 			}
 		}
-	}
+	});
 })
 
 module.exports.save = async function(messages) {
