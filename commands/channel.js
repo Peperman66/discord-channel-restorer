@@ -19,5 +19,5 @@ module.exports.execute = async function(interaction) {
 module.exports.data = {
 	name: 'channel',
 	description: 'Manage saving and restoring channels',
-	subcommandFiles: ['channel/list.js', 'channel/restore.js', 'channel/save.js']
+	subcommandFiles: ['channel/list.js', 'channel/restore.js', 'channel/save.js', 'channel/delete.js']
 };
