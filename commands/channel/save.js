@@ -1,4 +1,4 @@
-const db = require('better-sqlite3')('db/data.db');
+const db = require('better-sqlite3')('db/data.db', {fileMustExist: true});
 const messageSave = require('../../handlers/messageSave.js');
 const {ChannelType} = require('discord-api-types/v9');
 const { Collection } = require('discord.js');
@@ -20,7 +20,7 @@ async function getAllMessagesInChannel(channel) {
 }
 
 module.exports.execute = async function(interaction) {
-	interaction.deferReply();
+	await interaction.deferReply();
 	const targetChannel = interaction.options.getChannel("channel");
 	if (targetChannel.partial) {
 		await targetChannel.fetch();
