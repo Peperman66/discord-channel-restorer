@@ -21,20 +21,25 @@ async function getAllMessagesInChannel(channel) {
 
 module.exports.execute = async function(interaction) {
 	interaction.deferReply();
-	const targetChannel = interaction.options.get("channel").channel;
+	const targetChannel = interaction.options.getChannel("channel");
 	if (targetChannel.partial) {
 		await targetChannel.fetch();
 	}
 	const messages = await getAllMessagesInChannel(targetChannel);
-	messageSave.save(messages);
-	
-	if (channelSaveExistsQuery.get(targetChannel.id) != null) {
-		channelSaveUpdateQuery.run(Date.now() / 1000, targetChannel.id);
-	} else {
-		channelSaveCreateQuery.run(targetChannel.id, targetChannel.guild.id, targetChannel.name, Date.now() / 1000);
-	}
+	messageSave.save(messages)
+		.then(() => {
+			if (channelSaveExistsQuery.get(targetChannel.id) != null) {
+				channelSaveUpdateQuery.run(Math.floor(Date.now() / 1000), targetChannel.id);
+			} else {
+				channelSaveCreateQuery.run(targetChannel.id, targetChannel.guild.id, targetChannel.name, Date.now() / 1000);
+			}
 
-	interaction.followUp("Done!");
+			interaction.followUp("Done!");
+		})
+		.catch((e) => {
+			interaction.followUp("Error!");
+			console.error(e);
+		})	
 }
 
 module.exports.data = {
