@@ -4,7 +4,7 @@ const {ChannelType} = require('discord-api-types/v9');
 const { Collection } = require('discord.js');
 
 const channelSaveExistsQuery = db.prepare('SELECT * FROM Channel WHERE ID = ?');
-const channelSaveCreateQuery = db.prepare('INSERT INTO Channel (ID, GuildID, Name, LastSaved) VALUES (?, ?, ?, ?)');
+const channelSaveCreateQuery = db.prepare('INSERT INTO Channel (ID, GuildID, Name, Topic, LastSaved) VALUES (?, ?, ?, ?, ?)');
 const channelSaveUpdateQuery = db.prepare('UPDATE Channel SET LastSaved = ? WHERE ID = ?');
 
 async function getAllMessagesInChannel(channel) {
@@ -31,7 +31,7 @@ module.exports.execute = async function(interaction) {
 			if (channelSaveExistsQuery.get(targetChannel.id) != null) {
 				channelSaveUpdateQuery.run(Math.floor(Date.now() / 1000), targetChannel.id);
 			} else {
-				channelSaveCreateQuery.run(targetChannel.id, targetChannel.guild.id, targetChannel.name, Date.now() / 1000);
+				channelSaveCreateQuery.run(targetChannel.id, targetChannel.guild.id, targetChannel.name, targetChannel.topic, Date.now() / 1000);
 			}
 
 			interaction.followUp("Done!");

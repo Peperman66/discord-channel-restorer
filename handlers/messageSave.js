@@ -1,7 +1,7 @@
 const db = require('better-sqlite3')('db/data.db', {fileMustExist: true});
 
 const channelExistsQuery = db.prepare('SELECT * FROM Channel WHERE ID = ?');
-const channelCreateQuery = db.prepare('INSERT INTO Channel (ID, GuildID, Name, LastSaved) VALUES (?, ?, ?, ?)');
+const channelCreateQuery = db.prepare('INSERT INTO Channel (ID, GuildID, Name, Topic, LastSaved) VALUES (?, ?, ?, ?, ?)');
 
 const userExistQuery = db.prepare('SELECT * FROM User WHERE ID = ?');
 const userCreateQuery = db.prepare('INSERT INTO User (ID, Username, AvatarURL) VALUES (?, ?, ?)');
@@ -25,7 +25,7 @@ const saveTransaction = db.transaction(async (messages) => {
 			if (message.channel.partial) {
 				await message.channel.fetch();
 			}
-			channelCreateQuery.run(message.channelId, message.guildId, message.channel.name, null);
+			channelCreateQuery.run(message.channelId, message.guildId, message.channel.name, message.channel.topic, null);
 		}
 		if (userExistQuery.get(message.author.id) == null) {
 			if (message.member == null) {

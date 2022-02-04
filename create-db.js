@@ -5,6 +5,7 @@ tables = [
 		ID VARCHAR(20) PRIMARY KEY,
 		GuildID VARCHAR(20) NOT NULL,
 		Name VARCHAR(100) NOT NULL,
+		Topic TEXT,
 		LastSaved TIMESTAMP
 	)`,
 	`CREATE TABLE IF NOT EXISTS User (

@@ -2,7 +2,7 @@ const { Collection, MessageAttachment } = require('discord.js');
 
 const db = require('better-sqlite3')('db/data.db', {readonly: true});
 
-const channelQuery = db.prepare('SELECT Name FROM Channel WHERE ID = ? AND GuildID = ?');
+const channelQuery = db.prepare('SELECT Name, Topic FROM Channel WHERE ID = ? AND GuildID = ?');
 const messageQuery = db.prepare(`
 SELECT Message.ID, Message.UserID, Message.Pinned, Message.Content, User.Username, User.AvatarURL FROM Message 
 INNER JOIN Channel ON Message.ChannelID = Channel.ID 
@@ -22,7 +22,7 @@ module.exports.execute = async function(interaction) {
 	if (interaction.guild.partial) {
 		await interaction.guild.fetch();
 	}
-	const targetChannel = await interaction.guild.channels.create(channelData.Name);
+	const targetChannel = await interaction.guild.channels.create(channelData.Name, {topic: channelData.Topic});
 
 	const messages = messageQuery.all(channelId, interaction.guildId);
 	const estimatedEnd = Date.now() + messages.length * 2000; //Every message takes two seconds to send
